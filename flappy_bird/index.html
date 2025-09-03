@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird</title>
+</head>
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: url('./assets/background.png') no-repeat center center fixed;
+        background-size: cover;
+    }
+
+    #canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    #score {
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin: 5px;
+        font-size: 24px;
+        color: #ff0000;
+        z-index: 10;
+    }
+</style>
+<body>
+<main>
+    <span id="score">0</span>
+    <canvas id="canvas"></canvas>
+</main>
+</body>
+<script type="module" src="script.js"></script>
+</html>

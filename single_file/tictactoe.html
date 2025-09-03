@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TicTacToe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+</head>
+<body>
+<span id="titel">Tic Tac Toe</span>
+<div id="board"></div>
+<span id="message">-</span>
+<button id="reset" onclick="reset()">Reset</button>
+
+<div id="start_overlay">
+    <button onclick="start()">Start</button>
+    <button id="ai_toggle">AI: OFF</button>
+</div>
+</body>
+<style>
+    body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(45deg, #ffbed5, #b2f8ff);
+        background-size: 200% 200%;
+        transition: background-position 0.5s ease-in-out;
+
+        user-select: none;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+
+        font-family: "Nunito", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 500;
+        font-style: normal;
+    }
+
+    #titel {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    #board {
+        display: grid;
+        grid-template-columns: repeat(3, 100px);
+        grid-template-rows: repeat(3, 100px);
+        gap: 5px;
+    }
+
+    #message {
+        margin: 5px;
+        font-size: 18px;
+        opacity: 0;
+    }
+
+    #reset {
+        margin: 10px;
+        padding: 10px 20px;
+        font-size: 15px;
+        cursor: pointer;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        width: 20vw;
+        border-radius: 5px;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    .cell {
+        width: 100px;
+        height: 100px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 2em;
+        background-color: white;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    #start_overlay {
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        color: white;
+        font-size: 24px;
+        opacity: 0.9;
+
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            width: 10vw;
+            border-radius: 5px;
+            opacity: 1;
+        }
+    }
+
+</style>
+<script>
+    let board = document.getElementById('board');
+    let message_box = document.getElementById('message');
+    let currentPlayer = 'X';
+    let AI = false;
+    let won = false;
+
+    window.addEventListener('DOMContentLoaded', function () {
+        for (let i = 0; i < 9; i++) {
+            let cell = document.createElement('span');
+            cell.className = 'cell';
+            cell.onclick = () => handleClick(i);
+            board.appendChild(cell);
+        }
+    });
+
+    handleClick = (index) => {
+        let cell = board.children[index];
+        if (won) return;
+
+        if (cell.textContent !== '') return
+
+        if (currentPlayer === 'X') {
+            cell.textContent = 'X';
+        } else {
+            cell.textContent = 'O';
+        }
+
+        setTimeout(() => {
+            checkWin()
+        }, 10);
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        if (AI && currentPlayer === 'O' && !won) {
+            getRandomMove(board)
+        }
+    };
+
+    checkWin = () => {
+        const winningCombinations = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+            [0, 4, 8], [2, 4, 6] // diagonals
+        ];
+
+        for (let combination of winningCombinations) {
+            const [a, b, c] = combination;
+            if (board.children[a].textContent &&
+                board.children[a].textContent === board.children[b].textContent &&
+                board.children[a].textContent === board.children[c].textContent) {
+                end(false, combination);
+                return;
+            }
+        }
+
+        if ([...board.children].every(cell => cell.textContent)) {
+            end(true, null);
+        }
+    };
+
+    reset = () => {
+        for (let cell of board.children) {
+            cell.textContent = '';
+        }
+        currentPlayer = 'X';
+        message_box.style.opacity = '0';
+        document.getElementById('reset').style.opacity = '0';
+
+        for (let cell of board.children) {
+            cell.style.background = 'white';
+        }
+
+        won = false;
+    };
+
+    function end(draw, combination) {
+        const [a, b, c] = combination || [];
+        const win = 'linear-gradient(to bottom right, #aaffb1, #bfffc0)';
+
+        if (draw) {
+            message_box.innerText = 'It\'s a draw!';
+            message_box.style.color = 'blue';
+        } else {
+            board.children[a].style.background = win;
+            board.children[b].style.background = win;
+            board.children[c].style.background = win;
+
+            message_box.innerText = `${currentPlayer} won!`;
+            message_box.style.color = 'red';
+        }
+        message_box.style.opacity = '1';
+        document.getElementById('reset').style.opacity = '1';
+        won = true;
+    }
+
+    document.getElementById('ai_toggle').addEventListener('click', () => {
+        AI = !AI;
+        document.getElementById('ai_toggle').innerText = AI ? 'AI: ON' : 'AI: OFF';
+        document.body.style.backgroundPosition = AI ? '100% 50%' : '0 50%';
+    })
+
+    function start() {
+        document.getElementById('start_overlay').style.display = 'none';
+        reset();
+    }
+
+    function getRandomMove(board) {
+        const availableMoves = [];
+        for (let i = 0; i < 9; i++) {
+            if (board.children[i].innerHTML === '') availableMoves.push(i);
+        }
+
+        board.children[availableMoves[Math.floor(Math.random() * availableMoves.length)]].innerText = 'O';
+        setTimeout(() => {
+            checkWin();
+        }, 10);
+        currentPlayer = 'X';
+    }
+</script>
+</html>

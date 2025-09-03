@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Nim</title>
+</head>
+<body>
+    <div id="board">
+
+    </div>
+    <div id="input-wrapper">
+        <input id="input" type="number" min="1" max="3" value="1">
+        <button id="submit" type="submit">Submit</button>
+    </div>
+</body>
+<style>
+    body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(45deg, #ffbed5, #b2f8ff);
+        background-size: 200% 200%;
+        transition: background-position 0.5s ease-in-out;
+
+        user-select: none;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+
+        font-family: "Nunito", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 500;
+        font-style: normal;
+    }
+
+    #board {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 0;
+        margin: 0 0 5px;
+    }
+
+    .match {
+        content: ' ';
+        width: 10px;
+        height: 25vh;
+        background-color: black;
+    }
+
+    #input-wrapper {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+</style>
+<script>
+    const Board = document.getElementById('board');
+    let totalMatches = 21;
+
+    function AIMakeMove() {
+        let bestMove = (totalMatches - 1) % 4;
+        if (bestMove === 0 || bestMove > 3)
+        {
+            return Math.min(3, totalMatches); // If no winning move, take the maximum possible
+        }
+        return bestMove;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        for (let i = 0; i < totalMatches; i ++) {
+            let match = document.createElement('span');
+            match.classList.add('match');
+            board.append(match);
+        }
+    })
+
+    document.getElementById('submit').addEventListener('click', () => {
+        const num = document.getElementById('input').value;
+        console.log(num);
+        for (let i = 0; i < num; i++) {
+            board.children[i].remove()
+        }
+    });
+
+</script>
+</html>

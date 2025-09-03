@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Memory Game</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+
+            background: linear-gradient(45deg, #ffbed5, #b2f8ff);
+            background-size: 200% 200%;
+            transition: background-position 0.5s ease-in-out;
+
+            user-select: none;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+
+            font-family: "Nunito", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 500;
+            font-style: normal;
+        }
+        #board {
+            display: grid;
+            grid-template-columns: repeat(2, 100px);
+            grid-template-rows: repeat(2, 100px);
+            gap: 10px;
+            rotate: 45deg;
+            margin-bottom: 20px;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            cursor: pointer;
+            border-radius: 5px;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+            user-select: none;
+        }
+        #message {
+            text-align: center;
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 40px;
+        }
+        #reset {
+            display: none;
+            margin-top: 40px;
+            padding: 10px 30px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #reset:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+<div id="message">Watch the sequence!</div>
+<div id="board"></div>
+<button id="reset">Restart</button>
+<script>
+    const Board = document.getElementById('board');
+    const Message = document.getElementById('message');
+    const RestartBtn = document.getElementById('reset');
+    let Sequence = [];
+    let PlayerInput = [];
+    let Active = false;
+
+    const colors = ['#ff0000', '#0000ff', '#00ff00', '#ffff00'];
+    for (let i = 0; i < 4; i++) {
+        let cell = document.createElement('span');
+        cell.className = 'cell';
+        cell.style.backgroundColor = colors[i];
+        cell.addEventListener('mousedown', () => {
+            if (Active) cell.style.opacity = '1';
+        });
+        cell.addEventListener('mouseup', () => {
+            if (Active) cell.style.opacity = '0.5';
+        });
+        cell.addEventListener('click', () => handleClick(i));
+        Board.appendChild(cell);
+    }
+
+    // Start game
+    startNewGame();
+
+    function startNewGame() {
+        Sequence = [];
+        PlayerInput = [];
+        Message.textContent = "Watch the sequence!";
+        RestartBtn.style.display = "none";
+        setTimeout(nextRound, 1000);
+    }
+
+    function nextRound() {
+        PlayerInput = [];
+        Sequence.push(Math.floor(Math.random() * 4));
+        showSequence();
+    }
+
+    function showSequence() {
+        document.body.style.backgroundPosition = '100% 50%';
+        Active = false;
+        let i = 0;
+        const cells = Board.querySelectorAll('.cell');
+        Message.textContent = "Watch the sequence!";
+        function flashNext() {
+            if (i < Sequence.length) {
+                const idx = Sequence[i];
+                cells[idx].style.opacity = '1';
+                setTimeout(() => {
+                    cells[idx].style.opacity = '0.5';
+                    i++;
+                    setTimeout(flashNext, 300);
+                }, 500);
+            } else {
+                Active = true;
+                Message.textContent = "Now repeat the sequence!";
+                document.body.style.backgroundPosition = '0 50%';
+            }
+        }
+        flashNext();
+    }
+
+    function handleClick(index) {
+        if (!Active) return;
+        PlayerInput.push(index);
+        // Flash feedback
+        const cell = Board.children[index];
+        cell.style.opacity = '1';
+        setTimeout(() => cell.style.opacity = '0.5', 150);
+
+        // Check input so far
+        for (let i = 0; i < PlayerInput.length; i++) {
+            if (PlayerInput[i] !== Sequence[i]) {
+                // Wrong!
+                Active = false;
+                Message.textContent = "Wrong! Game over!";
+                RestartBtn.style.display = "inline-block";
+                return;
+            }
+        }
+        // If correct and finished
+        if (PlayerInput.length === Sequence.length) {
+            Active = false;
+            Message.textContent = "Correct! Next round...";
+            setTimeout(nextRound, 1200);
+        }
+    }
+
+    RestartBtn.addEventListener('click', startNewGame);
+</script>
+</body>
+</html>
