@@ -27,10 +27,12 @@ class Pipe {
             ctx.restore();
         }
 
-        ctx.save()
+        ctx.save();
         ctx.fillStyle = 'green';
-        ctx.fillRect(this.x, 0, this.width, this.height);
-        ctx.fillRect(this.x, this.gapY + this.gapHeight, this.width, this.height + 1000);
+        // Top pipe
+        ctx.fillRect(this.x, 0, this.width, this.gapY);
+        // Bottom pipe
+        ctx.fillRect(this.x, this.gapY + this.gapHeight, this.width, ctx.canvas.height - (this.gapY + this.gapHeight));
         ctx.restore();
     }
 

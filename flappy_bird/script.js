@@ -3,7 +3,7 @@
 // Import the Bird and Pipe classes
 import { Bird, ImageLoader } from './Bird.js';
 import game from './global_api.js';
-import PipeSpawner from "./pipe_spawner";
+import PipeSpawner from "./pipe_spawner.js";
 
 // Load required elements from the HTML
 const scoreElement = document.getElementById("score");
@@ -33,11 +33,12 @@ let touchingTrigger = false;
 
 // Example usage:
 //const pipe = new Pipe(400, 200, 60, 200, 2);
-const spawner = new PipeSpawner(1000, 0, 200, 60, 1000, 2)
+const spawner = new PipeSpawner(4000, 0, (window.innerHeight / 2 - 150), 60, 1000, 2)
 let bird;
 const imageLoader = new ImageLoader();
 imageLoader.load('./assets/bird.png', (birdImg) => {
     bird = new Bird(50, 300, 80, birdImg);
+    spawner.start()
 
     // Start the game loop only after the image is loaded
     gameLoop();
@@ -53,11 +54,12 @@ function gameLoop() {
 
     // Collision detection with pipe (top and bottom)
     const birdHitbox = bird.getHitbox();
-    let pipeHitboxes = spawner.getFirstPipe().getHitboxes(ctx);
+    let firstPipe = spawner.getFirstPipe();
+    let pipeHitboxes = firstPipe ? firstPipe.getHitboxes(ctx) : null;
 
     // Check for collision with the trigger hitbox
     if (
-        rectsIntersect(birdHitbox, pipeHitboxes.trigger)
+        pipeHitboxes && rectsIntersect(birdHitbox, pipeHitboxes.trigger)
     ) {
         if (!touchingTrigger) {
             score++;
@@ -69,8 +71,10 @@ function gameLoop() {
 
     // Check for collision with the top and bottom pipes
     if (
-        rectsIntersect(birdHitbox, pipeHitboxes.top) ||
-        rectsIntersect(birdHitbox, pipeHitboxes.bottom)
+        pipeHitboxes && (
+            rectsIntersect(birdHitbox, pipeHitboxes.top) ||
+            rectsIntersect(birdHitbox, pipeHitboxes.bottom)
+        )
     ) {
         alert("Game Over! Your score: " + scoreElement.textContent);
         running = false;

@@ -7,7 +7,7 @@ class Bird {
         this.velocity = 0;
         this.gravity = 0.5;
         this.image = image;
-        this.hitboxScale = 0.8; // Hitbox is 80% of the image size
+        this.hitboxScale = 0.6; // Hitbox is 80% of the image size
     }
 
     jump() {
